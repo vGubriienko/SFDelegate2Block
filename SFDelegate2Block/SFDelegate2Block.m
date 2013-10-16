@@ -59,19 +59,15 @@
 #pragma mark - NSObject
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
+
+    id block = _metadata[NSStringFromSelector(anInvocation.selector)];
     
-    BOOL found = NO;
-    for (NSString *selectorName in _metadata.allKeys) {
-        if ( anInvocation.selector == NSSelectorFromString(selectorName) ) {
-            id block = _metadata[selectorName];
-            [anInvocation invokeWithTarget:block];
-            found = YES;
-        }
-    }
-    
-    if ( !found ) {
+    if ( block ) {
+        [anInvocation invokeWithTarget:block];
+    } else {
         [super forwardInvocation:anInvocation];
     }
+    
 }
 
 - (NSMethodSignature*)methodSignatureForSelector:(SEL)selector {
